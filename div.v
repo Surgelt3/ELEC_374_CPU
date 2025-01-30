@@ -1,0 +1,37 @@
+module div(
+    input M[31:0], Q[31:0] in, 
+    output remainder[31:0], quotient[31:0] out
+);
+reg [31:0] A;
+reg [31:0] Dividend;
+reg [31:0] Divisor;
+reg [31:0] DivisorNeg;
+
+always @(*) begin
+	A = 32'b{32(0)};
+	Dividend = Q;
+	Divisor = M;
+	DivisorNeg = ~M + 1'b1;
+	for(i=1; i < 32; i = i + 1) begin
+		A = A << 1;
+		Dividend = Dividend << 1;
+		if (~A[31]) begin
+			A = A + DivisorNeg;
+		end
+		else if(A[31]) begin
+			A = A + Divisor;
+		end
+		
+		if(~A[31]) begin
+			Dividend[0] = 1;
+		end
+		else if(A[31]) begin
+			Divided[0] = 0;
+		end
+	end
+	if(A[31]) begin
+		A = A + Divisor;
+	end
+	quotient = Dividend;
+	remainder = Divisor;
+end
