@@ -13,8 +13,8 @@ always @(*) begin
 	Dividend = Q;
 	Divisor = M;
 	DivisorNeg = ~M + 1'b1;
-	for(i=1; i < 32; i = i + 1) begin
-		A = A << 1;
+	for(i=0; i < 32; i = i + 1) begin
+		A = (A << 1) | (Dividend[31]);
 		Dividend = Dividend << 1;
 		if (~A[31]) begin
 			A = A + DivisorNeg;
@@ -34,6 +34,6 @@ always @(*) begin
 		A = A + Divisor;
 	end
 	quotient = Dividend;
-	remainder = Divisor;
+	remainder = A;
 	end
 endmodule
