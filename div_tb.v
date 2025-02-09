@@ -2,13 +2,13 @@ module div_tb(
 
 );
 	reg [31:0] x, y;
-	wire [31:0] S, R;
+	wire [31:0] R, S;
 	reg [31:0] i, j;
 	
 	
-	div_32 div32(
+	div div32(
 		x, y,
-		S, R
+		R, S
 	);
 	
 	initial begin
