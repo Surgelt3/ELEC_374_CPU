@@ -52,7 +52,6 @@ module datapath_tb_AND(
 			T1 : Present_state = T2;
 			T2 : Present_state = T3;
 			T3 : Present_state = T4;
-			T4 : Present_state = T5;
 		endcase
 	end
 	

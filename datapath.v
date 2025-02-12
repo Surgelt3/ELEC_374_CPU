@@ -66,10 +66,10 @@ module datapath(
 	register RegHI(.clk(clk), .clr(reset), .D(BusMuxOut), .write_enable(HIin), .Q(HI));
 	register RegLO(.clk(clk), .clr(reset), .D(BusMuxOut), .write_enable(LOin), .Q(LO));
 	
-	mux_3_1 MDMux(BusMuxOut, IN, PC_PLUS_1, {IncPC, Read}, MDR_D);
+	mux_2_1 MDMux(BusMuxOut, IN, Read, MDR_D);
 	register RegMDR(.clk(clk), .clr(reset), .D(MDR_D), .write_enable(MDRin), .Q(MDR));
-	
-	alu alu_32 (Y, BusMuxOut, {AND, OR, ADD, SUB, MUL, DIV, SHR, SHRA, SHL, ROR, ROL, NEG, NOT}, ALU_C);
+		
+	alu alu_32 (Y, BusMuxOut, {NOT, NEG, ROL, ROR, SHL, SHRA, SHR, DIV, MUL, SUB, ADD, OR, AND}, ALU_C);
 	register RegZHI (.clk(clk), .clr(reset), .D(ALU_C[63:32]), .write_enable(Zin), .Q(ZHI));
 	register RegZLO (.clk(clk), .clr(reset), .D(ALU_C[31:0]), .write_enable(Zin), .Q(ZLO));
 						
