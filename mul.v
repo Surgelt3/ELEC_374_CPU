@@ -2,47 +2,42 @@ module mul (
 	input [31:0] M, Q,
 	output reg [63:0] P
 );	
-	
+
 	integer i;
+	integer j, k;
 	reg [63:0] A, B;
 	reg [31:0] negative, positive;
+	reg [31:0] temp;
 	
 	always @(*) begin
+				
 		B = {{32{1'b0}}, M};
 		A = {64{1'b0}};
+		temp = Q >> 1;
 		
-		for(i = 0; i < 32; i=i+1) begin
+		for(i = 0; i < 32; i=i+2) begin
 			if (i == 0) begin
-				if(~Q[0]) begin
-					positive[0] = 0;
-					negative[0] = 0;
-				end else 
-					negative[0] = 1;
-					positive[0] = 0;
-			end else if(~Q[i]) begin
-				if(~Q[i-1]) begin
-					positive[i] = 0;
-					negative[i] = 0; 
-				end else begin
-					positive[i] = 1;
-					negative[i] = 0;
-				end
+				case(Q[1:0])
+					2'b00: A = A;
+					2'b01: A = A + B;
+					2'b10: A = A + ((~B + 1'b1)<< 1);
+					2'b11: A = A;
+				endcase
 			end else begin
-				if(Q[i-1]) begin
-					positive[i] = 0;
-					negative[i] = 0; 
-				end else begin
-					positive[i] = 0;
-					negative[i] = 1;
-				end
+				j = i+1;
+				k = i-1; 
+				case(temp[2:0])
+					3'b000: A = A + 0;
+					3'b001: A = A + (B << i);
+					3'b010: A = A + (B << i);
+					3'b011: A = A + (B << (i+1));
+					3'b100: A = A + ((~B + 1'b1)<< (i+1));
+					3'b101: A = A + ((~B + 1'b1)<< (i));
+					3'b110: A = A + ((~B + 1'b1)<< (i));
+					3'b111: A = A + 0;
+				endcase
+				temp = temp >> 2;
 			end
-			if (negative[i])
-				A = A + ((~B + 1'b1)<< i);
-			else if (positive[i])
-				A = A + ((B)<< i);
-			else
-				A = A + {64{1'b0}};
-			$display("%d\n", A);
 		end
 		P = A;
 	end

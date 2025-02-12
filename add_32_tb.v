@@ -15,13 +15,9 @@ module add_32_tb(
 	
 	initial begin
 		C0=1'b0;
-		for (j=128; j < {32{1'b1}}; j = j+32'd567) begin
-			x = 32'd1345;
-			y = j;
-			#1;
-		end
+		x = 32'd1345;
+		y = j;
+		#1;
 		#2560 $stop;
 	end
-
-
 endmodule
