@@ -10,8 +10,12 @@ module mul (
 	reg [31:0] temp;
 	
 	always @(*) begin
-				
-		B = {{32{1'b0}}, M};
+		
+		if (M[31] == 1'b1)
+			B = {{32{1'b1}}, M};
+		else 
+			B = {{32{1'b0}}, M};
+		
 		A = {64{1'b0}};
 		temp = Q >> 1;
 		
@@ -21,7 +25,7 @@ module mul (
 					2'b00: A = A;
 					2'b01: A = A + B;
 					2'b10: A = A + ((~B + 1'b1)<< 1);
-					2'b11: A = A;
+					2'b11: A =  A + (~B + 1'b1);
 				endcase
 			end else begin
 				j = i+1;

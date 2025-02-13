@@ -12,9 +12,19 @@ module mul_tb(
 	);
 	
 	initial begin
-			M = 32'd5;
+			M = -32'd23;
 			Q = 32'd5;
-		#2560 $stop;
+		#100
+			M = 32'd23;
+			Q = -32'd5;
+		#100
+			M = -32'd23;
+			Q = -32'd5;
+		#100
+			M = 32'd23;
+			Q = 32'd5;
+		#100
+		$stop;
 	end
 
 
