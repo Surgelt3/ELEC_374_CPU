@@ -1,9 +1,11 @@
 module add_32(
 	input [31:0] x, y,
-	input C0, 
+	input C0,
+	output C32,
 	output [31:0] S
 );
-
+	
+	wire G_0, P_0, G_1, P_1, G_2, P_2, G_3, P_3, G_4, P_4, G_5, P_5, G_6, P_6, G_7, P_7, C4, C8, C12, C16, C20, C24, C28;
 
 	
 	add_4 add_0_3(x[3:0], y[3:0], C0, S[3:0], G_0, P_0);

@@ -5,11 +5,13 @@ module alu(
 );		
 
 	wire [63:0] mul_wire, add_wire, sub_wire, div_wire;
+	wire carry_add;
+	
 	always @(*) begin
 		case (control) 
 			13'b0000000000001: C = A & B;
 			13'b0000000000010: C = A | B;
-			13'b0000000000100: C = add_wire;
+			13'b0000000000100: C = {carry_add, add_wire};
 			13'b0000000001000: C = sub_wire;
 			13'b0000000010000: C = mul_wire;
 			13'b0000000100000: C = div_wire;
@@ -23,18 +25,24 @@ module alu(
 		endcase
 	end
 	
+	
+	div div_unit(
+		.Q(A), .M(B),
+		.remainder(), .quotient(Div_wire)
+	);
 
 	add_32 sub_unit(
-		A, ~B+1'b1, 
-		1'b0,
-		sub_wire
+		.x(A), .y(~B+1'b1), 
+		.C0(1'b0), 
+		.S(sub_wire)
 	);
 
 
 	add_32 add_unit(
-		A, B, 
-		1'b0,
-		add_wire
+		.x(A), .y(B), 
+		.C0(1'b0), 
+		.C32(carry_add), 
+		.S(add_wire)
 	);
 
 	mul mul_unit(
