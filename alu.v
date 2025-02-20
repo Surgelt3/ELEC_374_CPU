@@ -4,7 +4,8 @@ module alu(
 	output reg [63:0] C
 );		
 
-	wire [63:0] mul_wire, add_wire, sub_wire, div_wire;
+	wire [63:0] mul_wire;
+	wire [31:0] add_wire, sub_wire, div_wire, rem_wire;
 	wire carry_add;
 	
 	always @(*) begin
@@ -14,21 +15,21 @@ module alu(
 			13'b0000000000100: C = {carry_add, add_wire};
 			13'b0000000001000: C = sub_wire;
 			13'b0000000010000: C = mul_wire;
-			13'b0000000100000: C = div_wire;
+			13'b0000000100000: C = {rem_wire, div_wire};
 			13'b0000001000000: C = A >> B;
 			13'b0000010000000: C = A >>> B;
 			13'b0000100000000: C = A << B;
 			13'b0001000000000: C = (A>>B) | (A<<32-B);
 			13'b0010000000000: C = (A<<B) | (A>>32-B);
-			13'b0100000000000: C = ~A + 1'b1;
-			13'b1000000000000: C = ~A;
+			13'b0100000000000: C = ~B + 1'b1;
+			13'b1000000000000: C = ~B;
 		endcase
 	end
 	
 	
 	div div_unit(
 		.Q(A), .M(B),
-		.remainder(), .quotient(Div_wire)
+		.remainder(rem_wire), .quotient(Div_wire)
 	);
 
 	add_32 sub_unit(

@@ -10,14 +10,8 @@ module datapath_tb_MUL(
 	reg R0in, R1in, R2in, R3in, R4in, R5in, R6in, R7in, R8in, R9in, R10in, R11in, R12in, R13in, R14in, R15in;
 	reg HIin, LOin, PCin, IRin, Zin, Yin, MARin, MDRin;
 	reg [31:0] IN;
-	wire [31:0] BusMuxOut, PC, PC_PLUS_1;
-	
-	parameter Default = 4'b0000, Init = 4'b0001, Reg_load1a = 4'b0010, Reg_load1b = 4'b0011, Reg_load2a = 4'b0100,
-				Reg_load2b = 4'b0101, Reg_load3a = 4'b0110, Reg_load3b = 4'b0111, T0 = 4'b1000,
-				T1 = 4'b1001, T2 = 4'b1010, T3 = 4'b1011, T4 = 4'b1100, T5 = 4'b1101;
-	reg [3:0] Present_state = Default;
-		
-	
+
+	wire [31:0] BusMuxOut, PC;		
 
 	
 	datapath dp(
@@ -29,8 +23,13 @@ module datapath_tb_MUL(
 		R0in, R1in, R2in, R3in, R4in, R5in, R6in, R7in, R8in, R9in, R10in, R11in, R12in, R13in, R14in, R15in,
 		HIin, LOin, PCin, IRin, Zin, Yin, MARin, MDRin,
 		IN,
-		BusMuxOut, PC, PC_PLUS_1
+		BusMuxOut, PC
 	);
+	
+	parameter Default = 4'b0000, Init = 4'b0001, Reg_load1a = 4'b0010, Reg_load1b = 4'b0011, Reg_load2a = 4'b0100,
+				Reg_load2b = 4'b0101, Reg_load3a = 4'b0110, Reg_load3b = 4'b0111, T0 = 4'b1000,
+				T1 = 4'b1001, T2 = 4'b1010, T3 = 4'b1011, T4 = 4'b1100, T5 = 4'b1101;
+	reg [3:0] Present_state = Default;
 	
 	initial begin
 			clk = 0;
@@ -75,8 +74,8 @@ module datapath_tb_MUL(
 								#20 Read <= 0; MDRin <= 0;
 							end
 			Reg_load1b: begin
-								MDRout <= 1; R3in <= 1;
-								#20 MDRout <= 0; R3in <= 0;
+								MDRout <= 1; R2in <= 1;
+								#20 MDRout <= 0; R2in <= 0;
 							end
 			Reg_load2a: begin
 								IN <= 32'h00000024;
@@ -84,8 +83,8 @@ module datapath_tb_MUL(
 								#20 Read <= 0; MDRin <= 0;
 							end
 			Reg_load2b: begin
-								MDRout <= 1; R7in <= 1;
-								#20 MDRout <= 0; R7in <= 0;
+								MDRout <= 1; R6in <= 1;
+								#20 MDRout <= 0; R6in <= 0;
 							end
 			Reg_load3a: begin
 								IN <= 32'h00000028;
@@ -98,7 +97,7 @@ module datapath_tb_MUL(
 							end
 			T0: begin 
 				IncPC <= 1; MARin <= 1; PCin <= 1; MDRin <= 1;
-				Read <= 1; IN <= 32'h2A2B8000;
+				Read <= 1; IN <= 32'h81300000;
 				#20 IncPC <= 0; MARin <= 0; PCin <= 0; MDRin <= 0;
 				Read <= 0;
 			end
@@ -107,16 +106,16 @@ module datapath_tb_MUL(
 				#20 MDRout <= 0; IRin <= 0;
 			end
 			T2: begin
-				R3out <= 1; Yin <= 1;
-				#20 R3out <= 0; Yin <= 0;
+				R2out <= 1; Yin <= 1;
+				#20 R2out <= 0; Yin <= 0;
 			end
 			T3: begin
-				R7out <= 1; MUL <= 1; Zin <= 1;
-				#20 R7out <= 0; MUL <= 0; Zin <= 0;
+				R6out <= 1; MUL <= 1; Zin <= 1;
+				#20 R6out <= 0; Zin <= 0;
 			end
 			T4: begin
-				Zlowout <= 1; R4in <= 1;
-				#20 Zlowout <= 0; R4in <= 0;
+				HIin <= 1; LOin <= 1;
+				#20 HIin <= 0; LOin <= 0; MUL <= 0;
 			end
 		endcase
 	end

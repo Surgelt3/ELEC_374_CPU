@@ -13,19 +13,20 @@ module datapath(
 	input R0in, R1in, R2in, R3in, R4in, R5in, R6in, R7in, R8in, R9in, R10in, R11in, R12in, R13in, R14in, R15in, 
 	input HIin, LOin, PCin, IRin, Zin, Yin, MARin, MDRin, 
 	input [31:0] IN, 
-	
-	output [31:0] BusMuxOut, PC, PC_PLUS_1
+	output [31:0] BusMuxOut, PC
 );
 
-	//wire [31:0] BusMuxOut;
+	wire [31:0] R0, R1, R2, R3, R4, R5, R6, R7, R8, R9, R10, R11, R12, R13, R14, R15;
+	wire [31:0] HI, LO, ZHI, ZLO, IR, CSIGN, Y, MAR, MDR;
+
 	wire [31:0] MDR_D;
 	wire [63:0] ALU_C;
 	
-	wire [31:0] R0, R1, R2, R3, R4, R5, R6, R7, R8, R9, R10, R11, R12, R13, R14, R15;
-	wire [31:0] HI, LO, ZHI, ZLO   , IR, CSIGN, Y, MAR, MDR;
-	
+	wire [31:0] PC_PLUS_1;
 	wire [31:0] MAR_DATA, PC_DATA;
+	wire [31:0] HI_DATA, LO_DATA;
 	
+	wire ZtoHL;
 	
 	bus b(
 		R0out, R1out, R2out, R3out, R4out, R5out, R6out, R7out, R8out, R9out, R10out, R11out, R12out, R13out, R14out, R15out,
@@ -62,16 +63,21 @@ module datapath(
 	mux_2_1 MAR_mux(BusMuxOut, PC, IncPC, MAR_DATA);
 	register RegMAR(.clk(clk), .clr(reset), .D(MAR_DATA), .write_enable(MARin), .Q(MAR));
 	
-	
-	register RegHI(.clk(clk), .clr(reset), .D(BusMuxOut), .write_enable(HIin), .Q(HI));
-	register RegLO(.clk(clk), .clr(reset), .D(BusMuxOut), .write_enable(LOin), .Q(LO));
-	
+		
 	mux_2_1 MDMux(BusMuxOut, IN, Read, MDR_D);
 	register RegMDR(.clk(clk), .clr(reset), .D(MDR_D), .write_enable(MDRin), .Q(MDR));
 		
 	alu alu_32 (Y, BusMuxOut, {NOT, NEG, ROL, ROR, SHL, SHRA, SHR, DIV, MUL, SUB, ADD, OR, AND}, ALU_C);
 	register RegZHI (.clk(clk), .clr(reset), .D(ALU_C[63:32]), .write_enable(Zin), .Q(ZHI));
 	register RegZLO (.clk(clk), .clr(reset), .D(ALU_C[31:0]), .write_enable(Zin), .Q(ZLO));
+	
+	assign ZtoHL = DIV | MUL;
+	
+	mux_2_1 HI_mux(BusMuxOut, ZHI, ZtoHL, HI_DATA);
+	mux_2_1 LO_mux(BusMuxOut, ZLO, ZtoHL, LO_DATA);
+	register RegHI(.clk(clk), .clr(reset), .D(HI_DATA), .write_enable(HIin), .Q(HI));
+	register RegLO(.clk(clk), .clr(reset), .D(LO_DATA), .write_enable(LOin), .Q(LO));
+
 						
 		
 	add_32 pc_add(

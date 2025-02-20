@@ -1,4 +1,4 @@
-module datapath_tb_ROL(
+module datapath_tb_ADD(
 	
 );
 	
@@ -11,8 +11,8 @@ module datapath_tb_ROL(
 	reg HIin, LOin, PCin, IRin, Zin, Yin, MARin, MDRin;
 	reg [31:0] IN;
 
-	wire [31:0] BusMuxOut, PC;	
-	
+	wire [31:0] BusMuxOut, PC;		
+
 	
 	datapath dp(
 		clk, reset,
@@ -97,7 +97,7 @@ module datapath_tb_ROL(
 							end
 			T0: begin 
 				IncPC <= 1; MARin <= 1; PCin <= 1; MDRin <= 1;
-				Read <= 1; IN <= 32'h421B8000;
+				Read <= 1; IN <= 32'h1A1B8000;
 				#20 IncPC <= 0; MARin <= 0; PCin <= 0; MDRin <= 0;
 				Read <= 0;
 			end
@@ -110,8 +110,8 @@ module datapath_tb_ROL(
 				#20 R3out <= 0; Yin <= 0;
 			end
 			T3: begin
-				R7out <= 1; ROL <= 1; Zin <= 1;
-				#20 R7out <= 0; ROL <= 0; Zin <= 0;
+				R7out <= 1; ADD <= 1; Zin <= 1;
+				#20 R7out <= 0; ADD <= 0; Zin <= 0;
 			end
 			T4: begin
 				Zlowout <= 1; R4in <= 1;

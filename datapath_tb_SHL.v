@@ -10,15 +10,9 @@ module datapath_tb_SHL(
 	reg R0in, R1in, R2in, R3in, R4in, R5in, R6in, R7in, R8in, R9in, R10in, R11in, R12in, R13in, R14in, R15in;
 	reg HIin, LOin, PCin, IRin, Zin, Yin, MARin, MDRin;
 	reg [31:0] IN;
-	wire [31:0] BusMuxOut, PC, PC_PLUS_1;
-	
-	parameter Default = 4'b0000, Init = 4'b0001, Reg_load1a = 4'b0010, Reg_load1b = 4'b0011, Reg_load2a = 4'b0100,
-				Reg_load2b = 4'b0101, Reg_load3a = 4'b0110, Reg_load3b = 4'b0111, T0 = 4'b1000,
-				T1 = 4'b1001, T2 = 4'b1010, T3 = 4'b1011, T4 = 4'b1100, T5 = 4'b1101;
-	reg [3:0] Present_state = Default;
-		
-	
 
+	wire [31:0] BusMuxOut, PC;	
+	
 	
 	datapath dp(
 		clk, reset,
@@ -29,8 +23,13 @@ module datapath_tb_SHL(
 		R0in, R1in, R2in, R3in, R4in, R5in, R6in, R7in, R8in, R9in, R10in, R11in, R12in, R13in, R14in, R15in,
 		HIin, LOin, PCin, IRin, Zin, Yin, MARin, MDRin,
 		IN,
-		BusMuxOut, PC, PC_PLUS_1
+		BusMuxOut, PC
 	);
+	
+	parameter Default = 4'b0000, Init = 4'b0001, Reg_load1a = 4'b0010, Reg_load1b = 4'b0011, Reg_load2a = 4'b0100,
+				Reg_load2b = 4'b0101, Reg_load3a = 4'b0110, Reg_load3b = 4'b0111, T0 = 4'b1000,
+				T1 = 4'b1001, T2 = 4'b1010, T3 = 4'b1011, T4 = 4'b1100, T5 = 4'b1101;
+	reg [3:0] Present_state = Default;
 	
 	initial begin
 			clk = 0;
@@ -98,7 +97,7 @@ module datapath_tb_SHL(
 							end
 			T0: begin 
 				IncPC <= 1; MARin <= 1; PCin <= 1; MDRin <= 1;
-				Read <= 1; IN <= 32'h2A2B8000;
+				Read <= 1; IN <= 32'h5A1B8000;
 				#20 IncPC <= 0; MARin <= 0; PCin <= 0; MDRin <= 0;
 				Read <= 0;
 			end
