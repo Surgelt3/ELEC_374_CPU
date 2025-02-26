@@ -28,7 +28,7 @@ module datapath_tb_MUL(
 	
 	parameter Default = 4'b0000, Init = 4'b0001, Reg_load1a = 4'b0010, Reg_load1b = 4'b0011, Reg_load2a = 4'b0100,
 				Reg_load2b = 4'b0101, Reg_load3a = 4'b0110, Reg_load3b = 4'b0111, T0 = 4'b1000,
-				T1 = 4'b1001, T2 = 4'b1010, T3 = 4'b1011, T4 = 4'b1100, T5 = 4'b1101;
+				T1 = 4'b1001, T2 = 4'b1010, T3 = 4'b1011, T4 = 4'b1100, Done = 4'b1101;
 	reg [3:0] Present_state = Default;
 	
 	initial begin
@@ -51,6 +51,7 @@ module datapath_tb_MUL(
 			T1 : Present_state = T2;
 			T2 : Present_state = T3;
 			T3 : Present_state = T4;
+			T4 : Present_state = Done;
 		endcase
 	end
 	
@@ -116,6 +117,9 @@ module datapath_tb_MUL(
 			T4: begin
 				HIin <= 1; LOin <= 1;
 				#20 HIin <= 0; LOin <= 0; MUL <= 0;
+			end
+			Done: begin
+				
 			end
 		endcase
 	end
