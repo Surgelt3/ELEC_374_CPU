@@ -28,7 +28,7 @@ module datapath_tb_ROL(
 	
 	parameter Default = 4'b0000, Init = 4'b0001, Reg_load1a = 4'b0010, Reg_load1b = 4'b0011, Reg_load2a = 4'b0100,
 				Reg_load2b = 4'b0101, Reg_load3a = 4'b0110, Reg_load3b = 4'b0111, T0 = 4'b1000,
-				T1 = 4'b1001, T2 = 4'b1010, T3 = 4'b1011, T4 = 4'b1100, T5 = 4'b1101;
+				T1 = 4'b1001, T2 = 4'b1010, T3 = 4'b1011, T4 = 4'b1100, Done = 4'b1101;
 	reg [3:0] Present_state = Default;
 	
 	initial begin
@@ -51,6 +51,7 @@ module datapath_tb_ROL(
 			T1 : Present_state = T2;
 			T2 : Present_state = T3;
 			T3 : Present_state = T4;
+			T4 : Present_state = Done;
 		endcase
 	end
 	
@@ -58,18 +59,19 @@ module datapath_tb_ROL(
 	always @(posedge clk) begin
 		case (Present_state)
 			Init: begin
-								PCin <= 1; reset <= 1;
+								R0in <= 1; R1in <= 1; R2in <= 1; R3in <= 1; R4in <= 1; R5in <= 1; R6in <= 1; R7in <= 1; R8in <= 1; R9in <= 1; R10in <= 1; R11in <= 1;
+								R12in <= 1; R13in <= 1; R14in <= 1; R15in <= 1; HIin <= 1; LOin <= 1; PCin <= 1; IRin <= 1; Zin <= 1; Yin <= 1; MARin <= 1; MDRin <= 1;
+								reset <= 1;
 								#20 reset <= 0; R0out <= 0; R1out <= 0; R2out <= 0; R3out <= 0; R4out <= 0; R5out <= 0; R6out <= 0; R7out <= 0; R8out <= 0; R9out <= 0; R10out <= 0;
 								R11out <= 0; R12out <= 0; R13out <= 0; R14out <= 0; R15out <= 0; HIout <= 0; LOout <= 0; Zhighout <= 0; Zlowout <= 0; PCout <= 0; IRout <= 0; MDRout <=0 ; INout <= 0; Cout <= 0; Yout <= 0; MARout <= 0;
 								Read <= 0; IncPC <= 0;
 								AND <= 0; OR <= 0; ADD <= 0; SUB <= 0; MUL <= 0; DIV <= 0; SHR <= 0; SHRA <= 0; SHL <= 0; ROR <= 0; ROL <= 0; NEG <= 0; NOT <= 0;
 								R0in <= 0; R1in <= 0; R2in <= 0; R3in <= 0; R4in <= 0; R5in <= 0; R6in <= 0; R7in <= 0; R8in <= 0; R9in <= 0; R10in <= 0; R11in <= 0;
 								R12in <= 0; R13in <= 0; R14in <= 0; R15in <= 0; HIin <= 0; LOin <= 0; PCin <= 0; IRin <= 0; Zin <= 0; Yin <= 0; MARin <= 0; MDRin <= 0;
-								IN <= 0;
-								IN <= 32'd0;
+								IN <= 0;								
 			end
 			Reg_load1a: begin
-								IN <= 32'h00000022;
+								IN <= 32'hEB0C0D2A;
 								Read <= 1; MDRin <= 1;
 								#20 Read <= 0; MDRin <= 0;
 							end
@@ -116,6 +118,9 @@ module datapath_tb_ROL(
 			T4: begin
 				Zlowout <= 1; R4in <= 1;
 				#20 Zlowout <= 0; R4in <= 0;
+			end
+			Done: begin
+			
 			end
 		endcase
 	end

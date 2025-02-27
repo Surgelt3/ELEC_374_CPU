@@ -70,7 +70,7 @@ module datapath_tb_DIV(
 								IN <= 32'd0;
 			end
 			Reg_load1a: begin
-								IN <= 32'h00000022;
+								IN <= -32'd236;
 								Read <= 1; MDRin <= 1;
 								#20 Read <= 0; MDRin <= 0;
 							end
@@ -79,7 +79,7 @@ module datapath_tb_DIV(
 								#20 MDRout <= 0; R2in <= 0;
 							end
 			Reg_load2a: begin
-								IN <= 32'h00000024;
+								IN <= 32'd17;
 								Read <= 1; MDRin <= 1;
 								#20 Read <= 0; MDRin <= 0;
 							end
