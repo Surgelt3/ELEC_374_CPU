@@ -71,7 +71,7 @@ module datapath_tb_SUB(
 								IN <= 0;								
 			end
 			Reg_load1a: begin
-								IN <= 32'd47;
+								IN <= -32'd47;
 								Read <= 1; MDRin <= 1;
 								#20 Read <= 0; MDRin <= 0;
 							end
@@ -80,7 +80,7 @@ module datapath_tb_SUB(
 								#20 MDRout <= 0; R3in <= 0;
 							end
 			Reg_load2a: begin
-								IN <= -32'd12;
+								IN <= 32'd12;
 								Read <= 1; MDRin <= 1;
 								#20 Read <= 0; MDRin <= 0;
 							end
