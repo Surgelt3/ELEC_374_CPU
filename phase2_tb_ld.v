@@ -9,8 +9,9 @@ module phase2_tb_ld(
 	reg Gra, Grb, Grc, Rin, Rout, BAout;
 	reg HIin, LOin, PCin, IRin, Zin, Yin, MARin, MDRin, CONin, OUT_Portin;
 	reg read_mem, write_mem;
-	reg [31:0] IN_unit_input;
 	reg CON_RESET;
+	reg PCSave;
+	reg [31:0] IN_unit_input;
 	wire [31:0] OUT_unit_output;
 		
 		
@@ -20,17 +21,20 @@ module phase2_tb_ld(
 		Read, IncPC,
 		AND, OR, ADD, SUB, MUL, DIV, SHR, SHRA, SHL, ROR, ROL, NEG, NOT,
 		Gra, Grb, Grc, Rin, Rout, BAout,
-		HIin, LOin, PCin, IRin, Zin, Yin, MARin, MDRin, CONin, OUT_Portin,
+		HIin, LOin, PCin, IRin, Zin, Yin, MARin, MDRin, CONin, OUT_Portin, 
 		read_mem, write_mem,
 		CON_RESET,
+		PCSave,
 		IN_unit_input,
 		OUT_unit_output
 	);
 
-	parameter Default = 4'b0000, Init = 4'b0001, T0 = 4'b0010, T1 = 4'b0011, T2 = 4'b0100,
-				T3 = 4'b0101, T4 = 4'b0110, T5 = 4'b0111, T6 = 4'b1000, T7 =4'b1001 ,
-				Done = 4'b1010;
-	reg [3:0] Present_state = Default;
+	parameter Default = 5'b00000, Init = 5'b00001, Regload0 = 5'b00010, Regload1 = 5'b00011, Regload2 = 5'b00100,
+				Regload3 = 5'b00101, Regload4 = 5'b00110, Regload5 = 5'b00111, 
+				
+				T0 = 5'b01000, T1 = 5'b01001, T2 = 5'b01010, T3 = 5'b01011, T4 = 5'b01100, T5 = 5'b01101, T6 = 5'b01110, T7 = 5'b01111, 
+				Done = 5'b10000;
+	reg [4:0] Present_state = Default;
 	
 	initial begin
 			clk = 0;
@@ -41,7 +45,14 @@ module phase2_tb_ld(
 	begin
 		case (Present_state)
 			Default : Present_state = Init;
-			Init : Present_state = T0;
+			Init : Present_state = Regload0;
+			Regload0 : Present_state = Regload1;
+			Regload1 : Present_state = Regload2;
+			Regload2 : Present_state = Regload3;
+			Regload3 : Present_state = Regload4;
+			Regload4 : Present_state = Regload5;
+			Regload5 : Present_state = T0;
+			
 			T0 : Present_state = T1;
 			T1 : Present_state = T2;
 			T2 : Present_state = T3;
@@ -59,29 +70,55 @@ module phase2_tb_ld(
 		case (Present_state)
 			Init: begin
 			
-								PCin <= 1; IRin <= 1;
+								CON_RESET <= 1;
 								reset <= 1;
 								#20
 								reset <= 0; HIout <= 0; LOout <= 0; Zhighout <= 0; Zlowout <= 0; PCout <= 0; IRout <= 0; MDRout <=0 ; INout <= 0; Cout <= 0; Yout <= 0; MARout <= 0;
 								Read <= 0; IncPC <= 0;
 								AND <= 0; OR <= 0; ADD <= 0; SUB <= 0; MUL <= 0; DIV <= 0; SHR <= 0; SHRA <= 0; SHL <= 0; ROR <= 0; ROL <= 0; NEG <= 0; NOT <= 0;
 								Gra<=0; Grb <= 0; Grc <= 0; Rin <= 0; Rout <= 0; BAout <= 0;
-								HIin <= 0; LOin <= 0; PCin <= 0; IRin <= 0; Zin <= 0; Yin <= 0; MARin <= 0; MDRin <= 0;
+								HIin <= 0; LOin <= 0; PCin <= 0; IRin <= 0; Zin <= 0; Yin <= 0; MARin <= 0; MDRin <= 0; CONin <= 0;
 								read_mem <= 0; write_mem <= 0;
-								IN_unit_input <= 0; 
+								CON_RESET <= 0; PCSave <= 0;
+								IN_unit_input <= 0; OUT_Portin <= 0;
 			end
+			
+			Regload0: begin
+				IncPC <= 1; MARin <= 1; PCin <= 1;
+				#20 IncPC <= 0; MARin <= 0; PCin <= 0;
+			end
+			Regload1: begin
+				MDRin <= 1; Read <= 1;
+				#20;
+			end
+			Regload2: begin
+				MDRout <= 1; IRin <= 1;
+				#20 MDRout <= 0; IRin <= 0; Read <= 0; MDRin <= 0;
+			end
+			Regload3: begin
+				Grb <= 1; BAout <= 1; Yin <= 1;
+				#20 Grb <= 0; BAout <= 0; Yin <= 0;
+			end
+			Regload4: begin
+				Cout <= 1; ADD <= 1; Zin <= 1;
+				#20 Cout <= 0; ADD <= 0; Zin <= 0;
+			end
+			Regload5: begin
+				Zlowout <= 1; Gra <= 1; Rin <= 1; 		
+				#20 Zlowout <= 0; Gra <= 0; Rin <= 0; 
+			end
+			
 			T0: begin 
 				IncPC <= 1; MARin <= 1; PCin <= 1;
-				Read <= 1;
 				#20 IncPC <= 0; MARin <= 0; PCin <= 0;
 			end
 			T1: begin
-				MDRin <= 1;
-				#20 MDRin <= 0; Read <= 0;
+				MDRin <= 1; Read <= 1;
+				#20;
 			end
 			T2: begin
 				MDRout <= 1; IRin <= 1;
-				#20 MDRout <= 0; IRin <= 0;
+				#20 MDRout <= 0; IRin <= 0; Read <= 0; MDRin <= 0;
 			end
 			T3: begin
 				Grb <= 1; BAout <= 1; Yin <= 1;
@@ -92,7 +129,7 @@ module phase2_tb_ld(
 				#20 Cout <= 0; ADD <= 0; Zin <= 0;
 			end
 			T5: begin
-				Zlowout <= 1; MARin <= 1; Read <= 1;
+				Zlowout <= 1; MARin <= 1;
 				#20 Zlowout <= 0; MARin <= 0;
 			end
 			T6: begin
@@ -100,9 +137,10 @@ module phase2_tb_ld(
 				#20;
 			end
 			T7: begin
-				Gra <= 1; Rin <= 1; Read <= 1;
-				#20 Gra <= 0; Rin <= 0; Read <= 0; MDRin <= 0;
+				MDRout <= 1; Gra <= 1; Rin <= 1;
+				#20 MDRout <= 0; Gra <= 0; Rin <= 0; Read <= 0; MDRin <= 0;
 			end
+			
 			Done: begin
 				
 			end

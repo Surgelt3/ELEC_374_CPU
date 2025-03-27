@@ -9,6 +9,7 @@ module CPU(
 	input HIin, LOin, PCin, IRin, Zin, Yin, MARin, MDRin, CONin, OUT_Portin,
 	input read_mem, write_mem,
 	input CON_RESET,
+	input PCSave,
 	input [31:0] IN_unit_input, 
 	output [31:0] OUT_unit_output
 );
@@ -23,6 +24,7 @@ module CPU(
 		Gra, Grb, Grc, Rin, Rout, BAout,
 		HIin, LOin, PCin, IRin, Zin, Yin, MARin, MDRin, CONin, OUT_Portin,
 		CON_RESET,
+		PCSave,
 		IN_unit_input, 
 		BusMuxIn_MDR, OUT_MDR,
 		BusMuxOut, MAR, OUT_unit_output

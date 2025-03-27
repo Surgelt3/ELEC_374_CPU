@@ -10,6 +10,7 @@ module phase2_tb_st(
 	reg HIin, LOin, PCin, IRin, Zin, Yin, MARin, MDRin, CONin, OUT_Portin;
 	reg read_mem, write_mem;
 	reg CON_RESET;
+	reg PCSave;
 	reg [31:0] IN_unit_input;
 	wire [31:0] OUT_unit_output;
 		
@@ -23,6 +24,7 @@ module phase2_tb_st(
 		HIin, LOin, PCin, IRin, Zin, Yin, MARin, MDRin, CONin, OUT_Portin, 
 		read_mem, write_mem,
 		CON_RESET,
+		PCSave,
 		IN_unit_input,
 		OUT_unit_output
 	);
@@ -75,8 +77,8 @@ module phase2_tb_st(
 								Gra<=0; Grb <= 0; Grc <= 0; Rin <= 0; Rout <= 0; BAout <= 0;
 								HIin <= 0; LOin <= 0; PCin <= 0; IRin <= 0; Zin <= 0; Yin <= 0; MARin <= 0; MDRin <= 0; CONin <= 0;
 								read_mem <= 0; write_mem <= 0;
-								CON_RESET <= 0;
-								IN_unit_input <= 0; 
+								CON_RESET <= 0; PCSave <= 0;
+								IN_unit_input <= 0; OUT_Portin <= 0;
 			end
 			
 			Regload0: begin
