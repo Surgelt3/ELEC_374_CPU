@@ -35,6 +35,7 @@ module datapath(
 	
 	wire ZtoHL;
 	wire [31:0] pc_inc;
+	wire [31:0] CSIGN_PLUS1;
 	
 	bus b(
 		R0out, R1out, R2out, R3out, R4out, R5out, R6out, R7out, R8out, R9out, R10out, R11out, R12out, R13out, R14out, R15out,
@@ -94,8 +95,12 @@ module datapath(
 	mux_2_1 LO_mux(BusMuxOut, ZLO, ZtoHL, LO_DATA);
 	register RegHI(.clk(clk), .clr(reset), .D(HI_DATA), .write_enable(HIin), .Q(HI));
 	register RegLO(.clk(clk), .clr(reset), .D(LO_DATA), .write_enable(LOin), .Q(LO));
+	
+	add_32 add_1(
+		.x(CSIGN), .y(32'd1), .C0(32'd0),.S(CSIGN_PLUS1)
+	);
 		
-	assign pc_inc = CON ? CSIGN:32'd1;
+	assign pc_inc = CON ? CSIGN_PLUS1:32'd1;
 		
 	add_32 pc_add(
 		.x(PC), .y(pc_inc), .C0(32'd0),.S(PC_PLUS_1)

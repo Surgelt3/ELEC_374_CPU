@@ -167,7 +167,7 @@ module phase2_tb_mflo(
 			end
 			Mulreg4: begin
 				Gra <= 1; Rout <= 1; MUL <= 1; Zin <= 1;
-				#20 Grc <= 0; Rout <= 0; MUL <= 0; Zin <= 0;
+				#20 Grc <= 0; Rout <= 0; Zin <= 0;
 			end
 			Mulreg5: begin
 				HIin <= 1; LOin <= 1;
@@ -187,8 +187,8 @@ module phase2_tb_mflo(
 				#20 MDRout <= 0; IRin <= 0; Read <= 0; MDRin <= 0;
 			end
 			T3: begin
-				Zlowout <= 1; Gra <= 1; Rin <= 1;
-				#20 Zlowout <= 0; Gra <= 0; Rin <= 0;
+				LOout <= 1; Gra <= 1; Rin <= 1;
+				#20 LOout <= 0; Gra <= 0; Rin <= 0;
 			end
 
 			Done: begin
