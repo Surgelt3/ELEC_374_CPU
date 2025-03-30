@@ -69,13 +69,9 @@ module datapath(
 	mux_2_1 PC_mux(BusMuxOut, PC_PLUS_1, IncPC, PC_DATA);
 	register RegPC(.clk(clk), .clr(reset), .D(PC_DATA), .write_enable(PCin), .Q(PC));
 	
-	
-	
-	register RegIR(.clk(clk), .clr(reset), .D(BusMuxOut), .write_enable(IRin), .Q(IR));
+	async_reg RegIR(.clr(reset), .D(BusMuxOut), .write_enable(IRin), .Q(IR));
 	
 	register RegY(.clk(clk), .clr(reset), .D(BusMuxOut), .write_enable(Yin), .Q(Y));
-	
-	
 	
 	mux_2_1 MAR_mux(BusMuxOut, PC, IncPC, MAR_DATA);
 	register RegMAR(.clk(clk), .clr(reset), .D(MAR_DATA), .write_enable(MARin), .Q(MAR));

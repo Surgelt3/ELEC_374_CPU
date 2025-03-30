@@ -9,11 +9,14 @@ module control_unit(
 	output reg CON_RESET,
 	output reg BAout,
 	output [15:0] regin, regout,
-	output [31:0] C_sign_extended
+	output [31:0] CSIGN
 );
 
 	reg Gra, Grb, Grc, Rin, Rout;
 	reg PCSave;
+	
+	wire [31:0] IR_bus;
+	
 	parameter reset_state = 7'd0, 
 					fetch0 = 7'd1, fetch1 = 7'd2, fetch2 = 7'd3, 
 					load0 = 7'd4, load1 = 7'd5, load2 = 7'd6, load3 = 7'd7, load4 = 7'd8,
