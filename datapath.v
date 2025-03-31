@@ -13,7 +13,7 @@ module datapath(
 	input R15in, R14in, R13in, R12in, R11in, R10in, R9in, R8in, R7in, R6in,R5in, R4in, R3in, R2in, R1in, R0in, 
 	input HIin, LOin, PCin, IRin, Zin, Yin, MARin, MDRin, CONin, OUT_Portin, 
 	input BAout,
-	input CON_RESET,
+	input CON_RESET, Br,
 	input [31:0] IN_unit_input, CSIGN,
 	inout [31:0] BusMuxIn_MDR, OUT_MDR,
 	output [31:0] BusMuxOut, MAR, IR, OUT_unit_output
@@ -92,11 +92,15 @@ module datapath(
 	register RegHI(.clk(clk), .clr(reset), .D(HI_DATA), .write_enable(HIin), .Q(HI));
 	register RegLO(.clk(clk), .clr(reset), .D(LO_DATA), .write_enable(LOin), .Q(LO));
 	
-	add_32 add_1(
-		.x(CSIGN), .y(32'd1), .C0(32'd0),.S(CSIGN_PLUS1)
-	);
+	//add_32 add_1(
+	//	.x(CSIGN), .y(32'd1), .C0(32'd0),.S(CSIGN_PLUS1)
+	//);
+	
+	wire [31:0] plus1;
+	
+	assign plus1 = Br ? 32'd0 : 32'd1;
 		
-	assign pc_inc = CON ? CSIGN_PLUS1:32'd1;
+	assign pc_inc = CON ? CSIGN:plus1;
 		
 	add_32 pc_add(
 		.x(PC), .y(pc_inc), .C0(32'd0),.S(PC_PLUS_1)
