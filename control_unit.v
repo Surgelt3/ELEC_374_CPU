@@ -1,5 +1,5 @@
 module control_unit(
-	input clk, reset,
+	input clk, reset, stop,
 	input [31:0] IR,
 	output reg Read, IncPC, 
 	output reg HIout, LOout, Zhighout, Zlowout, PCout, IRout, MDRout, INout, Cout, Yout, MARout, 
@@ -8,6 +8,7 @@ module control_unit(
 	output reg write_mem,
 	output reg CON_RESET,
 	output reg BAout,
+	output reg run,
 	output [15:0] regin, regout,
 	output [31:0] CSIGN
 );
@@ -54,7 +55,11 @@ module control_unit(
 	
 		if (reset)
 			present_state = reset_state;
-		else begin
+		else if (stop) begin
+			present_state = present_state;
+			run = 0;
+		end else begin
+			run = 1;
 			case(present_state)
 				reset_state: present_state = fetch0;
 				fetch0: present_state = fetch1;

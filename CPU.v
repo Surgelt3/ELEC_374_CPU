@@ -1,6 +1,7 @@
 module CPU(
-	input clk, reset,
+	input clk, reset, stop, 
 	input [31:0] IN_unit_input, 
+	output run,
 	output [31:0] OUT_unit_output
 );
 
@@ -10,10 +11,10 @@ module CPU(
 	wire Read, write_mem;
 	
 	core c(
-		clk, reset,
+		clk, reset, stop,
 		IN_unit_input, 
 		BusMuxIn_MDR, OUT_MDR,
-		Read, write_mem,
+		Read, write_mem, run, 
 		MAR, OUT_unit_output
 	);
 	

@@ -1,8 +1,8 @@
 module core (
-		input clk, reset,
+		input clk, reset, stop,
 		input [31:0] IN_unit_input, 
 		inout [31:0] BusMuxIn_MDR, OUT_MDR,
-		output Read, write_mem, 
+		output Read, write_mem, run, 
 		output [31:0] MAR, OUT_unit_output
 );
 	
@@ -18,7 +18,7 @@ module core (
 	wire CON_RESET;
 	
 	control_unit cntrl_unit(
-		clk, reset,
+		clk, reset, stop,
 		IR,
 		Read, IncPC, 
 		HIout, LOout, Zhighout, Zlowout, PCout, IRout, MDRout, INout, Cout, Yout, MARout, 
@@ -27,6 +27,7 @@ module core (
 		write_mem,
 		CON_RESET,
 		BAout,
+		run,
 		{R15in, R14in, R13in, R12in, R11in, R10in, R9in, R8in, R7in, R6in,R5in, R4in, R3in, R2in, R1in, R0in}, 
 		{R15out, R14out, R13out, R12out, R11out, R10out, R9out, R8out, R7out, R6out,R5out, R4out, R3out, R2out, R1out, R0out},
 		CSIGN

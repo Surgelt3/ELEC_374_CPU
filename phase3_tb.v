@@ -2,14 +2,16 @@ module phase3_tb(
 	
 );
 	
-	reg clk, reset;
+	reg clk, reset, stop;
 	reg [31:0] IN_unit_input;
+	wire run;
 	wire [31:0] OUT_unit_output;
 		
 		
 	CPU cpu(
-		clk, reset,
+		clk, reset, stop,
 		IN_unit_input, 
+		run,
 		OUT_unit_output
 	);
 
@@ -35,7 +37,7 @@ module phase3_tb(
 	always @(posedge clk) begin
 		case (Present_state)
 			Init: begin
-					reset <= 1; IN_unit_input <= 32'd0;
+					stop <= 0; reset <= 1; IN_unit_input <= 32'd0;
 					#20 reset <= 0;
 			end
 			Test: begin
