@@ -15,7 +15,7 @@ module core (
 	wire HIout, LOout, Zhighout, Zlowout, PCout, IRout, MDRout, INout, Cout, Yout, MARout;
 	wire HIin, LOin, PCin, IRin, Zin, Yin, MARin, MDRin, CONin, OUT_Portin;
 	wire AND, OR, ADD, SUB, MUL, DIV, SHR, SHRA, SHL, ROR, ROL, NEG, NOT;
-	wire CON_RESET;
+	wire CON_RESET, Br;
 	
 	control_unit cntrl_unit(
 		clk, reset, stop,
@@ -25,7 +25,7 @@ module core (
 		HIin, LOin, PCin, IRin, Zin, Yin, MARin, MDRin, CONin, OUT_Portin,
 		AND, OR, ADD, SUB, MUL, DIV, SHR, SHRA, SHL, ROR, ROL, NEG, NOT,
 		write_mem,
-		CON_RESET,
+		CON_RESET, Br,
 		BAout,
 		run,
 		{R15in, R14in, R13in, R12in, R11in, R10in, R9in, R8in, R7in, R6in,R5in, R4in, R3in, R2in, R1in, R0in}, 
@@ -46,7 +46,7 @@ module core (
 		R15in, R14in, R13in, R12in, R11in, R10in, R9in, R8in, R7in, R6in,R5in, R4in, R3in, R2in, R1in, R0in, 
 		HIin, LOin, PCin, IRin, Zin, Yin, MARin, MDRin, CONin, OUT_Portin,
 		BAout,
-		CON_RESET,
+		CON_RESET, Br,
 		IN_unit_input, CSIGN,
 		BusMuxIn_MDR, OUT_MDR,
 		BusMuxOut, MAR, IR, OUT_unit_output

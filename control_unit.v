@@ -6,7 +6,7 @@ module control_unit(
 	output reg HIin, LOin, PCin, IRin, Zin, Yin, MARin, MDRin, CONin, OUT_Portin,
 	output reg AND, OR, ADD, SUB, MUL, DIV, SHR, SHRA, SHL, ROR, ROL, NEG, NOT,
 	output reg write_mem,
-	output reg CON_RESET,
+	output reg CON_RESET, Br,
 	output reg BAout,
 	output reg run,
 	output [15:0] regin, regout,
@@ -213,7 +213,7 @@ module control_unit(
 						Gra<=0; Grb <= 0; Grc <= 0; Rin <= 0; Rout <= 0; BAout <= 0;
 						HIin <= 0; LOin <= 0; PCin <= 0; IRin <= 0; Zin <= 0; Yin <= 0; MARin <= 0; MDRin <= 0; CONin <= 0;
 						write_mem <= 0;
-						CON_RESET <= 1; PCSave <= 0;
+						CON_RESET <= 1; Br<= 0; PCSave <= 0;
 						OUT_Portin <= 0;
 			end
 			fetch0: begin
@@ -225,7 +225,7 @@ module control_unit(
 				write_mem <= 0;
 				CON_RESET <= 0; PCSave <= 0;
 				OUT_Portin <= 0;
-				CON_RESET <= 0;
+				CON_RESET <= 0; Br <= 0;
 				IncPC <= 1; MARin <= 1; PCin <= 1;
 			end
 			fetch1: begin
@@ -478,11 +478,11 @@ module control_unit(
 			end
 			neg1: begin
 				Grb <= 0; Rout <= 0; Yin <= 0;
-				Grc <= 1; Rout <= 1; NEG <= 1; Zin <= 1;
+				Grb <= 1; Rout <= 1; NEG <= 1; Zin <= 1;
 			end
 			neg2: begin
-				Grc <= 0; Rout <= 0; NEG <= 0; Zin <= 0;
-				Gra <= 1; Rin <= 1;
+				Grb <= 0; Rout <= 0; NEG <= 0; Zin <= 0;
+				Zlowout <= 1; Gra <= 1; Rin <= 1;
 			end
 
 			not0: begin
@@ -491,11 +491,11 @@ module control_unit(
 			end
 			not1: begin
 				Grb <= 0; Rout <= 0; Yin <= 0;
-				Grc <= 1; Rout <= 1; NOT <= 1; Zin <= 1;
+				Grb <= 1; Rout <= 1; NOT <= 1; Zin <= 1;
 			end
 			not2: begin
-				Grc <= 0; Rout <= 0; NOT <= 0; Zin <= 0;
-				Gra <= 1; Rin <= 1;
+				Grb <= 0; Rout <= 0; NOT <= 0; Zin <= 0;
+				Zlowout <= 1; Gra <= 1; Rin <= 1;
 			end
 			
 			br0: begin
@@ -504,10 +504,10 @@ module control_unit(
 			end
 			br1: begin
 				Gra <= 0; Rout <= 0; CONin <= 0;
-				IncPC <= 1; PCin <= 1; 
+				IncPC <= 1; PCin <= 1; Br <= 1;
 			end
 			br2: begin
-				IncPC <= 0; PCin <= 0;
+				IncPC <= 0; PCin <= 0; Br <= 0;
 				CON_RESET <= 1;
 			end
 			
