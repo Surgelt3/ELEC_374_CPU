@@ -9,7 +9,7 @@ module ram(
 	integer i;
 	
 	initial begin
-		#20 $readmemh("C:/\Users/\lucas/\Desktop/\ELEC_374/\mem.txt", memory);
+		#20 $readmemh("C:/\Users/\lucas/\Desktop/\ELEC_374/\mem.mif", memory);
 	end
 	
 	always @(posedge clk) begin

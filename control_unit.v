@@ -2,22 +2,28 @@ module control_unit(
 	input clk, reset, stop,
 	input [31:0] IR,
 	output reg Read, IncPC, 
-	output reg HIout, LOout, Zhighout, Zlowout, PCout, IRout, MDRout, INout, Cout, Yout, MARout, 
+	output reg HIoutA, LOoutA, ZhighoutA, ZlowoutA, PCoutA, IRoutA, MDRoutA, INoutA, CoutA, YoutA, MARoutA, 
+	output reg HIoutB, LOoutB, ZhighoutB, ZlowoutB, PCoutB, IRoutB, MDRoutB, INoutB, CoutB, YoutB, MARoutB, 
+	output reg HIoutC, LOoutC, ZhighoutC, ZlowoutC, PCoutC, IRoutC, MDRoutC, INoutC, CoutC, YoutC, MARoutC, 
 	output reg HIin, LOin, PCin, IRin, Zin, Yin, MARin, MDRin, CONin, OUT_Portin,
 	output reg AND, OR, ADD, SUB, MUL, DIV, SHR, SHRA, SHL, ROR, ROL, NEG, NOT,
 	output reg write_mem,
 	output reg CON_RESET, Br,
 	output reg BAout,
 	output reg run,
-	output [15:0] regin, regout,
+	output reg [1:0] RinSel,
+	output [15:0] regin, regout_A, regout_B, regout_C,
 	output [31:0] CSIGN
 );
 
-	reg Gra, Grb, Grc, Rin, Rout;
+	reg Gra, Grb, Grc, Rin, RoutA, RoutB, RoutC;
 	reg PCSave;
+	
 	
 	wire [31:0] IR_bus;
 	
+	reg HIout, LOout, Zhighout, Zlowout, PCout, IRout, MDRout, INout, Cout, Yout, MARout, Rout;
+	//st
 	parameter reset_state = 7'd0, 
 					fetch0 = 7'd1, fetch1 = 7'd2, fetch2 = 7'd3, 
 					load0 = 7'd4, load1 = 7'd5, load2 = 7'd6, load3 = 7'd7, load4 = 7'd8,
@@ -100,101 +106,81 @@ module control_unit(
 				load0: present_state = load1;
 				load1: present_state = load2;
 				load2: present_state = load3;
-				load3: present_state = load4;
-				load4: present_state = fetch0;
+				load3: present_state = fetch1;
 				
 				loadi0: present_state = loadi1;
-				loadi1: present_state = loadi2;
-				loadi2: present_state = fetch0;
+				loadi1: present_state = fetch2;
 				
 				st0: present_state = st1;
 				st1: present_state = st2;
 				st2: present_state = st3;
-				st3: present_state = st4;
-				st4: present_state = fetch0;
+				st3: present_state = fetch0;
 				
 				add0: present_state = add1;
-				add1: present_state = add2;
-				add2: present_state = fetch0;
+				add1: present_state = fetch2;
 				
 				sub0: present_state = sub1;
-				sub1: present_state = sub2;
-				sub2: present_state = fetch0;
+				sub1: present_state = fetch2;
 				
 				and0: present_state = and1;
-				and1: present_state = and2;
-				and2: present_state = fetch0;
+				and1: present_state = fetch2;
 				
 				or0: present_state = or1;
-				or1: present_state = or2;
-				or2: present_state = fetch0;
+				or1: present_state = fetch2;
 
 				ror0: present_state = ror1;
-				ror1: present_state = ror2;
-				ror2: present_state = fetch0;
+				ror1: present_state = fetch2;
 
 				rol0: present_state = rol1;
-				rol1: present_state = rol2;
-				rol2: present_state = fetch0;
+				rol1: present_state = fetch2;
 
 				shr0: present_state = shr1;
-				shr1: present_state = shr2;
-				shr2: present_state = fetch0;
+				shr1: present_state = fetch2;
 
 				shra0: present_state = shra1;
-				shra1: present_state = shra2;
-				shra2: present_state = fetch0;
+				shra1: present_state = fetch2;
 
 				shl0: present_state = shl1;
-				shl1: present_state = shl2;
-				shl2: present_state = fetch0;
+				shl1: present_state = fetch2;
 				
 				addi0: present_state = addi1;
-				addi1: present_state = addi2;
-				addi2: present_state = fetch0;
+				addi1: present_state = fetch2;
 
 				andi0: present_state = andi1;
-				andi1: present_state = andi2;
-				andi2: present_state = fetch0;
+				andi1: present_state = fetch2;
 
 				ori0: present_state = ori1;
-				ori1: present_state = ori2;
-				ori2: present_state = fetch0;
+				ori1: present_state = fetch2;
 
 				div0: present_state = div1;
-				div1: present_state = div2;
-				div2: present_state = fetch0;
+				div1: present_state = fetch2;
 
 				mul0: present_state = mul1;
-				mul1: present_state = mul2;
-				mul2: present_state = fetch0;
+				mul1: present_state = fetch2;
 
 				neg0: present_state = neg1;
-				neg1: present_state = neg2;
-				neg2: present_state = fetch0;
+				neg1: present_state = fetch2;
 
 				not0: present_state = not1;
-				not1: present_state = not2;
-				not2: present_state = fetch0;
+				not1: present_state = fetch2;
 				
 				br0: present_state = br1;
-				br1: present_state = br2;
-				br2: present_state = fetch0;
+				br1: present_state = fetch0;
 
 				jal0: present_state = jal1;
 				jal1: present_state = fetch0;
 
 				jr0: present_state = fetch0;
 
-				in0: present_state = fetch0;
+				in0: present_state = fetch1;
 
-				out0: present_state = fetch0;
+				out0: present_state = fetch1;
 
-				mflo0: present_state = fetch0;
+				mflo0: present_state = fetch1;
 				
-				mfhi0: present_state = fetch0;
+				mfhi0: present_state = fetch1;
 				
-				nop0: present_state = fetch0;
+				nop0: present_state = fetch1;
 
 				halt0: present_state = DONE;
 				
@@ -207,20 +193,24 @@ module control_unit(
 	always @(*) begin
 		case(present_state) 
 			reset_state: begin
-						HIout <= 0; LOout <= 0; Zhighout <= 0; Zlowout <= 0; PCout <= 0; IRout <= 0; MDRout <=0 ; INout <= 0; Cout <= 0; Yout <= 0; MARout <= 0;
+						HIoutA <= 0; LOoutA <= 0; ZhighoutA <= 0; ZlowoutA <= 0; PCoutA <= 0; IRoutA <= 0; MDRoutA <=0 ; INoutA <= 0; CoutA <= 0; YoutA <= 0; MARoutA <= 0;
+						HIoutB <= 0; LOoutB <= 0; ZhighoutB <= 0; ZlowoutB <= 0; PCoutB <= 0; IRoutB <= 0; MDRoutB <=0 ; INoutB <= 0; CoutB <= 0; YoutB <= 0; MARoutB <= 0;
+						HIoutC <= 0; LOoutC <= 0; ZhighoutC <= 0; ZlowoutC <= 0; PCoutC <= 0; IRoutC <= 0; MDRoutC <=0 ; INoutC <= 0; CoutC <= 0; YoutC <= 0; MARoutC <= 0;
 						Read <= 0; IncPC <= 0;
 						AND <= 0; OR <= 0; ADD <= 0; SUB <= 0; MUL <= 0; DIV <= 0; SHR <= 0; SHRA <= 0; SHL <= 0; ROR <= 0; ROL <= 0; NEG <= 0; NOT <= 0;
-						Gra<=0; Grb <= 0; Grc <= 0; Rin <= 0; Rout <= 0; BAout <= 0;
+						Gra<=0; Grb <= 0; Grc <= 0; Rin <= 0; RoutA <= 0; RoutB <= 0; RoutC <= 0; BAout <= 0;
 						HIin <= 0; LOin <= 0; PCin <= 0; IRin <= 0; Zin <= 0; Yin <= 0; MARin <= 0; MDRin <= 0; CONin <= 0;
 						write_mem <= 0;
 						CON_RESET <= 1; Br<= 0; PCSave <= 0;
-						OUT_Portin <= 0;
+						OUT_Portin <= 0; RinSel <= 2'b00;
 			end
 			fetch0: begin
-				HIout <= 0; LOout <= 0; Zhighout <= 0; Zlowout <= 0; PCout <= 0; IRout <= 0; MDRout <=0 ; INout <= 0; Cout <= 0; Yout <= 0; MARout <= 0;
+				HIoutA <= 0; LOoutA <= 0; ZhighoutA <= 0; ZlowoutA <= 0; PCoutA <= 0; IRoutA <= 0; MDRoutA <=0 ; INoutA <= 0; CoutA <= 0; YoutA <= 0; MARoutA <= 0;
+				HIoutB <= 0; LOoutB <= 0; ZhighoutB <= 0; ZlowoutB <= 0; PCoutB <= 0; IRoutB <= 0; MDRoutB <=0 ; INoutB <= 0; CoutB <= 0; YoutB <= 0; MARoutB <= 0;
+				HIoutC <= 0; LOoutC <= 0; ZhighoutC <= 0; ZlowoutC <= 0; PCoutC <= 0; IRoutC <= 0; MDRoutC <=0 ; INoutC <= 0; CoutC <= 0; YoutC <= 0; MARoutC <= 0;
 				Read <= 0; IncPC <= 0;
 				AND <= 0; OR <= 0; ADD <= 0; SUB <= 0; MUL <= 0; DIV <= 0; SHR <= 0; SHRA <= 0; SHL <= 0; ROR <= 0; ROL <= 0; NEG <= 0; NOT <= 0;
-				Gra<=0; Grb <= 0; Grc <= 0; Rin <= 0; Rout <= 0; BAout <= 0;
+				Gra<=0; Grb <= 0; Grc <= 0; Rin <= 0; RoutA <= 0; RoutB <= 0; RoutC <= 0; BAout <= 0;
 				HIin <= 0; LOin <= 0; PCin <= 0; IRin <= 0; Zin <= 0; Yin <= 0; MARin <= 0; MDRin <= 0; CONin <= 0;
 				write_mem <= 0;
 				CON_RESET <= 0; PCSave <= 0;
@@ -229,328 +219,258 @@ module control_unit(
 				IncPC <= 1; MARin <= 1; PCin <= 1;
 			end
 			fetch1: begin
-				IncPC <= 0; MARin <= 0; PCin <= 0;
-				MDRin <= 1; Read <= 1;
+				IncPC <= 0; MARin <= 0; PCin <= 0; 
+				MDRin <= 0; MDRoutA <= 0; Gra <= 0; Rin <= 0;
+				write_mem <= 0;
+				CON_RESET <= 0;
+				Gra <= 0; RoutA <= 0;
+				INoutA <= 0;
+				OUT_Portin <= 0;
+				LOoutA <= 0;
+				HIoutA <= 0;
+				Read <= 1;
 			end
 			fetch2: begin
-				MDRout <= 1; IRin <= 1;
+				ZlowoutA <= 0; Gra <= 0; Rin <= 0;
+				HIin <= 0; LOin <= 0; DIV <= 0; MUL <= 0;
+				MDRin <= 1; Read <= 1; MDRoutC <= 1; IRin <= 1; RinSel <= 2'b10; 
 			end
 			
 			load0: begin
-				MDRout <= 0; IRin <= 0; Read <= 0; MDRin <= 0;
-				Grb <= 1; BAout <= 1; Yin <= 1;
+				MDRin <= 0; Read <= 0; MDRoutC <= 0; IRin <= 0;
+				Grb <= 1; BAout <= 1; CoutC <= 1; ADD <= 1; Zin <= 1;
 			end
 			load1: begin
-				Grb <= 0; BAout <= 0; Yin <= 0;
-				Cout <= 1; ADD <= 1; Zin <= 1;				
+				Grb <= 0; BAout <= 0; CoutC <= 0; ADD <= 0; Zin <= 0;
+				ZlowoutA <= 1; MARin <= 1; RinSel <= 2'b00;
 			end
 			load2: begin
-				Cout <= 0; ADD <= 0; Zin <= 0;	
-				Zlowout <= 1; MARin <= 1;
+				ZlowoutA <= 0; MARin <= 0;
+				Read <= 1;
 			end
 			load3: begin
-				Zlowout <= 0; MARin <= 0;
-				Read <= 1; MDRin <= 1;
-			end
-			load4: begin
-				MDRout <= 1; Gra <= 1; Rin <= 1;
+				MDRin <= 1; Read <= 1; MDRoutA <= 1; Gra <= 1; Rin <= 1; RinSel <= 2'b00; IncPC <= 1; MARin <= 1; PCin <= 1;
 			end
 
 			loadi0: begin
-				MDRout <= 0; IRin <= 0; Read <= 0; MDRin <= 0;
-				Grb <= 1; BAout <= 1; Yin <= 1;
+				MDRin <= 0; Read <= 0; MDRoutC <= 0; IRin <= 0;
+				Grb <= 1; BAout <= 1; CoutC <= 1; ADD <= 1; Zin <= 1; IncPC <= 1; MARin <= 1; PCin <= 1;
 			end
 			loadi1: begin
-				Grb <= 0; BAout <= 0; Yin <= 0;
-				Cout <= 1; ADD <= 1; Zin <= 1;
-			end
-			loadi2: begin
-				Cout <= 0; ADD <= 0; Zin <= 0;
-				Zlowout <= 1; Gra <= 1; Rin <= 1;
+				Grb <= 0; BAout <= 0; CoutC <= 0; ADD <= 0; Zin <= 0; IncPC <= 0; MARin <= 0; PCin <= 0;
+				ZlowoutA <= 1; Gra <= 1; Rin <= 1; RinSel <= 2'b00; Read <= 1;
 			end
 
 			st0: begin
-				MDRout <= 0; IRin <= 0; Read <= 0; MDRin <= 0;
-				Grb <= 1; BAout <= 1; Yin <= 1;
+				MDRin <= 0; Read <= 0; MDRoutC <= 0; IRin <= 0;
+				Grb <= 1; BAout <= 1; CoutC <= 1; ADD <= 1; Zin <= 1;
 			end
 			st1: begin
-				Grb <= 0; BAout <= 0; Yin <= 0;
-				Cout <= 1; ADD <= 1; Zin <= 1;
+				Grb <= 0; BAout <= 0; CoutC <= 0; ADD <= 0; Zin <= 0;
+				ZlowoutA <= 1; MARin <= 1; RinSel <= 2'b00;
 			end
 			st2: begin
-				Cout <= 0; ADD <= 0; Zin <= 0;
-				Zlowout <= 1; MARin <= 1;
+				ZlowoutA <= 0; MARin <= 0;
+				Gra <= 1; RoutA <= 1; MDRin <= 1; RinSel <= 2'b00;
 			end
 			st3: begin
-				Zlowout <= 0; MARin <= 0;
-				Gra <= 1; Rout <= 1; MDRin <= 1;
-			end
-			st4: begin
-				Gra <= 0; Rout <= 0; MDRin <= 0;
+				Gra <= 0; RoutA <= 0; MDRin <= 0;
 				write_mem <= 1;
 			end
 
 			add0: begin
-				MDRout <= 0; IRin <= 0; Read <= 0; MDRin <= 0;
-				Grb <= 1; Rout <= 1; Yin <= 1; 
+				MDRin <= 0; Read <= 0; MDRoutC <= 0; IRin <= 0;
+				Grb <= 1; RoutB <= 1; Grc <= 1; RoutC <= 1; ADD <= 1; Zin <= 1; IncPC <= 1; MARin <= 1; PCin <= 1;
 			end
 			add1: begin
-				Grb <= 0; Rout <= 0; Yin <= 0;
-				Grc <= 1; Rout <= 1; ADD <= 1; Zin <= 1; 
-			end
-			add2: begin
-				Grc <= 0; Rout <= 0; ADD <= 0; Zin <= 0;
-				Zlowout <= 1; Gra <= 1; Rin <= 1;
+				Grb <= 0; RoutB <= 0; Grc <= 0; RoutC <= 0; ADD <= 0; Zin <= 0; IncPC <= 0; MARin <= 0; PCin <= 0;
+				ZlowoutA <= 1; Gra <= 1; Rin <= 1; RinSel <= 2'b00; Read <= 1;
 			end
 			
 			sub0: begin
-				MDRout <= 0; IRin <= 0; Read <= 0; MDRin <= 0;
-				Grb <= 1; Rout <= 1; Yin <= 1; 
+				MDRin <= 0; Read <= 0; MDRoutC <= 0; IRin <= 0;
+				Grb <= 1; RoutB <= 1; Grc <= 1; RoutC <= 1; SUB <= 1; Zin <= 1; IncPC <= 1; MARin <= 1; PCin <= 1;
 			end
 			sub1: begin
-				Grb <= 0; Rout <= 0; Yin <= 0;
-				Grc <= 1; Rout <= 1; SUB <= 1; Zin <= 1; 
-			end
-			sub2: begin
-				Grc <= 0; Rout <= 0; SUB <= 0; Zin <= 0;
-				Zlowout <= 1; Gra <= 1; Rin <= 1;
+				Grb <= 0; RoutB <= 0; Grc <= 0; RoutC <= 0; SUB <= 0; Zin <= 0; IncPC <= 0; MARin <= 0; PCin <= 0;
+				ZlowoutA <= 1; Gra <= 1; Rin <= 1; RinSel <= 2'b00; Read <= 1;
 			end
 			
 			and0: begin
-				MDRout <= 0; IRin <= 0; Read <= 0; MDRin <= 0;
-				Grb <= 1; Rout <= 1; Yin <= 1; 
+				MDRin <= 0; Read <= 0; MDRoutC <= 0; IRin <= 0;
+				Grb <= 1; RoutB <= 1; Grc <= 1; RoutC <= 1; AND <= 1; Zin <= 1; IncPC <= 1; MARin <= 1; PCin <= 1;
 			end
 			and1: begin
-				Grb <= 0; Rout <= 0; Yin <= 0;
-				Grc <= 1; Rout <= 1; AND <= 1; Zin <= 1; 
-			end
-			and2: begin
-				Grc <= 0; Rout <= 0; AND <= 0; Zin <= 0;
-				Zlowout <= 1; Gra <= 1; Rin <= 1;
+				Grb <= 0; RoutB <= 0; Grc <= 0; RoutC <= 0; AND <= 0; Zin <= 0; IncPC <= 0; MARin <= 0; PCin <= 0;
+				ZlowoutA <= 1; Gra <= 1; Rin <= 1; RinSel <= 2'b00; Read <= 1;
 			end
 			
 			or0: begin
-				MDRout <= 0; IRin <= 0; Read <= 0; MDRin <= 0;
-				Grb <= 1; Rout <= 1; Yin <= 1; 
+				MDRin <= 0; Read <= 0; MDRoutC <= 0; IRin <= 0;
+				Grb <= 1; RoutB <= 1; Grc <= 1; RoutC <= 1; OR <= 1; Zin <= 1; IncPC <= 1; MARin <= 1; PCin <= 1;
 			end
 			or1: begin
-				Grb <= 0; Rout <= 0; Yin <= 0;
-				Grc <= 1; Rout <= 1; OR <= 1; Zin <= 1; 
-			end
-			or2: begin
-				Grc <= 0; Rout <= 0; OR <= 0; Zin <= 0;
-				Zlowout <= 1; Gra <= 1; Rin <= 1;
+				Grb <= 0; RoutB <= 0; Grc <= 0; RoutC <= 0; OR <= 0; Zin <= 0; IncPC <= 0; MARin <= 0; PCin <= 0;
+				ZlowoutA <= 1; Gra <= 1; Rin <= 1; RinSel <= 2'b00; Read <= 1;
 			end
 			
 			ror0: begin
-				MDRout <= 0; IRin <= 0; Read <= 0; MDRin <= 0;
-				Grb <= 1; Rout <= 1; Yin <= 1; 
+				MDRin <= 0; Read <= 0; MDRoutC <= 0; IRin <= 0;
+				Grb <= 1; RoutB <= 1; Grc <= 1; RoutC <= 1; ROR <= 1; Zin <= 1; IncPC <= 1; MARin <= 1; PCin <= 1;
 			end
 			ror1: begin
-				Grb <= 0; Rout <= 0; Yin <= 0;
-				Grc <= 1; Rout <= 1; ROR <= 1; Zin <= 1; 
-			end
-			ror2: begin
-				Grc <= 0; Rout <= 0; ROR <= 0; Zin <= 0;
-				Zlowout <= 1; Gra <= 1; Rin <= 1;
+				Grb <= 0; RoutB <= 0; Grc <= 0; RoutC <= 0; ROR <= 0; Zin <= 0; IncPC <= 0; MARin <= 0; PCin <= 0;
+				ZlowoutA <= 1; Gra <= 1; Rin <= 1; RinSel <= 2'b00; Read <= 1;
 			end
 			
 			rol0: begin
-				MDRout <= 0; IRin <= 0; Read <= 0; MDRin <= 0;
-				Grb <= 1; Rout <= 1; Yin <= 1; 
+				MDRin <= 0; Read <= 0; MDRoutC <= 0; IRin <= 0;
+				Grb <= 1; RoutB <= 1; Grc <= 1; RoutC <= 1; ROL <= 1; Zin <= 1; IncPC <= 1; MARin <= 1; PCin <= 1;
 			end
 			rol1: begin
-				Grb <= 0; Rout <= 0; Yin <= 0;
-				Grc <= 1; Rout <= 1; ROL <= 1; Zin <= 1; 
-			end
-			rol2: begin
-				Grc <= 0; Rout <= 0; ROL <= 0; Zin <= 0;
-				Zlowout <= 1; Gra <= 1; Rin <= 1;
+				Grb <= 0; RoutB <= 0; Grc <= 0; RoutC <= 0; ROL <= 0; Zin <= 0; IncPC <= 0; MARin <= 0; PCin <= 0;
+				ZlowoutA <= 1; Gra <= 1; Rin <= 1; RinSel <= 2'b00; Read <= 1;
 			end
 			
 			shr0: begin
-				MDRout <= 0; IRin <= 0; Read <= 0; MDRin <= 0;
-				Grb <= 1; Rout <= 1; Yin <= 1; 
+				MDRin <= 0; Read <= 0; MDRoutC <= 0; IRin <= 0;
+				Grb <= 1; RoutB <= 1; Grc <= 1; RoutC <= 1; SHR <= 1; Zin <= 1; IncPC <= 1; MARin <= 1; PCin <= 1;
 			end
 			shr1: begin
-				Grb <= 0; Rout <= 0; Yin <= 0;
-				Grc <= 1; Rout <= 1; SHR <= 1; Zin <= 1; 
-			end
-			shr2: begin
-				Grc <= 0; Rout <= 0; SHR <= 0; Zin <= 0;
-				Zlowout <= 1; Gra <= 1; Rin <= 1;
+				Grb <= 0; RoutB <= 0; Grc <= 0; RoutC <= 0; SHR <= 0; Zin <= 0; IncPC <= 0; MARin <= 0; PCin <= 0;
+				ZlowoutA <= 1; Gra <= 1; Rin <= 1; RinSel <= 2'b00; Read <= 1;
 			end
 			
 			shra0: begin
-				MDRout <= 0; IRin <= 0; Read <= 0; MDRin <= 0;
-				Grb <= 1; Rout <= 1; Yin <= 1; 
+				MDRin <= 0; Read <= 0; MDRoutC <= 0; IRin <= 0;
+				Grb <= 1; RoutB <= 1; Grc <= 1; RoutC <= 1; SHRA <= 1; Zin <= 1; IncPC <= 1; MARin <= 1; PCin <= 1;
 			end
 			shra1: begin
-				Grb <= 0; Rout <= 0; Yin <= 0;
-				Grc <= 1; Rout <= 1; SHRA <= 1; Zin <= 1; 
-			end
-			shra2: begin
-				Grc <= 0; Rout <= 0; SHRA <= 0; Zin <= 0;
-				Zlowout <= 1; Gra <= 1; Rin <= 1;
+				Grb <= 0; RoutB <= 0; Grc <= 0; RoutC <= 0; SHRA <= 0; Zin <= 0; IncPC <= 0; MARin <= 0; PCin <= 0;
+				ZlowoutA <= 1; Gra <= 1; Rin <= 1; RinSel <= 2'b00; Read <= 1;
 			end
 			
 			shl0: begin
-				MDRout <= 0; IRin <= 0; Read <= 0; MDRin <= 0;
-				Grb <= 1; Rout <= 1; Yin <= 1; 
+				MDRin <= 0; Read <= 0; MDRoutC <= 0; IRin <= 0;
+				Grb <= 1; RoutB <= 1; Grc <= 1; RoutC <= 1; SHL <= 1; Zin <= 1; IncPC <= 1; MARin <= 1; PCin <= 1;
 			end
 			shl1: begin
-				Grb <= 0; Rout <= 0; Yin <= 0;
-				Grc <= 1; Rout <= 1; SHL <= 1; Zin <= 1; 
-			end
-			shl2: begin
-				Grc <= 0; Rout <= 0; SHL <= 0; Zin <= 0;
-				Zlowout <= 1; Gra <= 1; Rin <= 1;
+				Grb <= 0; RoutB <= 0; Grc <= 0; RoutC <= 0; SHL <= 0; Zin <= 0; IncPC <= 0; MARin <= 0; PCin <= 0;
+				ZlowoutA <= 1; Gra <= 1; Rin <= 1; RinSel <= 2'b00; Read <= 1;
 			end
 						
 			addi0: begin
-				MDRout <= 0; IRin <= 0; Read <= 0; MDRin <= 0;
-				Grb <= 1; Rout <= 1; Yin <= 1; 
+				MDRin <= 0; Read <= 0; MDRoutC <= 0; IRin <= 0;
+				Grb <= 1; RoutB <= 1; CoutC <= 1; ADD <= 1; Zin <= 1; IncPC <= 1; MARin <= 1; PCin <= 1;
 			end
 			addi1: begin
-				Grb <= 0; Rout <= 0; Yin <= 0;
-				Cout <= 1; ADD <= 1; Zin <= 1; 
-			end
-			addi2: begin
-				Cout <= 0; ADD <= 0; Zin <= 0;
-				Zlowout <= 1; Gra <= 1; Rin <= 1;
+				Grb <= 0; RoutB <= 0; CoutC <= 0; ADD <= 0; Zin <= 0; IncPC <= 0; MARin <= 0; PCin <= 0;
+				ZlowoutA <= 1; Gra <= 1; Rin <= 1; RinSel <= 2'b00; Read <= 1;
 			end
 
 			andi0: begin
-				MDRout <= 0; IRin <= 0; Read <= 0; MDRin <= 0;
-				Grb <= 1; Rout <= 1; Yin <= 1; 
+				MDRin <= 0; Read <= 0; MDRoutC <= 0; IRin <= 0;
+				Grb <= 1; RoutB <= 1; CoutC <= 1; AND <= 1; Zin <= 1; IncPC <= 1; MARin <= 1; PCin <= 1;
 			end
 			andi1: begin
-				Grb <= 0; Rout <= 0; Yin <= 0;
-				Cout <= 1; AND <= 1; Zin <= 1; 
-			end
-			andi2: begin
-				Cout <= 0; AND <= 0; Zin <= 0;
-				Zlowout <= 1; Gra <= 1; Rin <= 1;
+				Grb <= 0; RoutB <= 0; CoutC <= 0; AND <= 0; Zin <= 0; IncPC <= 0; MARin <= 0; PCin <= 0;
+				ZlowoutA <= 1; Gra <= 1; Rin <= 1; RinSel <= 2'b00; Read <= 1;
 			end
 			
 			ori0: begin
-				MDRout <= 0; IRin <= 0; Read <= 0; MDRin <= 0;
-				Grb <= 1; Rout <= 1; Yin <= 1; 
+				MDRin <= 0; Read <= 0; MDRoutC <= 0; IRin <= 0;
+				Grb <= 1; RoutB <= 1; CoutC <= 1; OR <= 1; Zin <= 1; IncPC <= 1; MARin <= 1; PCin <= 1;
 			end
 			ori1: begin
-				Grb <= 0; Rout <= 0; Yin <= 0;
-				Cout <= 1; OR <= 1; Zin <= 1; 
-			end
-			ori2: begin
-				Cout <= 0; OR <= 0; Zin <= 0;
-				Zlowout <= 1; Gra <= 1; Rin <= 1;
+				Grb <= 0; RoutB <= 0; CoutC <= 0; OR <= 0; Zin <= 0; IncPC <= 0; MARin <= 0; PCin <= 0;
+				ZlowoutA <= 1; Gra <= 1; Rin <= 1; RinSel <= 2'b00; Read <= 1;
 			end
 			
 			div0: begin
-				MDRout <= 0; IRin <= 0; Read <= 0; MDRin <= 0;
-				Gra <= 1; Rout <= 1; Yin <= 1; 
+				MDRin <= 0; Read <= 0; MDRoutC <= 0; IRin <= 0;
+				Gra <= 1; RoutA <= 1; Grb <= 1; RoutB <= 1; DIV <= 1; Zin <= 1; IncPC <= 1; MARin <= 1; PCin <= 1;
 			end
 			div1: begin
-				Gra <= 0; Rout <= 0; Yin <= 0;
-				Grb <= 1; Rout <= 1; DIV <= 1; Zin <= 1;
-			end
-			div2: begin
-				Grb <= 0; Rout <= 0; Zin <= 0;
-				HIin <= 1; LOin <= 1;
+				Gra <= 0; RoutA <= 0; Grb <= 0; RoutB <= 0; DIV <= 1; Zin <= 0; IncPC <= 0; MARin <= 0; PCin <= 0;
+				HIin <= 1; LOin <= 1; Read <= 1;
 			end
 			
 			mul0: begin
-				MDRout <= 0; IRin <= 0; Read <= 0; MDRin <= 0;
-				Gra <= 1; Rout <= 1; Yin <= 1; 
+				MDRin <= 0; Read <= 0; MDRoutC <= 0; IRin <= 0;
+				Gra <= 1; RoutA <= 1; Grb <= 1; RoutB <= 1; MUL <= 1; Zin <= 1; IncPC <= 1; MARin <= 1; PCin <= 1;
 			end
 			mul1: begin
-				Gra <= 0; Rout <= 0; Yin <= 0;
-				Grb <= 1; Rout <= 1; MUL <= 1; Zin <= 1;
-			end
-			mul2: begin
-				Grb <= 0; Rout <= 0; Zin <= 0;
-				HIin <= 1; LOin <= 1;
+				Gra <= 0; RoutA <= 0; Grb <= 0; RoutB <= 0; MUL <= 1; Zin <= 0; IncPC <= 0; MARin <= 0; PCin <= 0;
+				HIin <= 1; LOin <= 1; Read <= 1;
 			end
 						
 			neg0: begin
-				MDRout <= 0; IRin <= 0; Read <= 0; MDRin <= 0;
-				Grb <= 1; Rout <= 1; Yin <= 1; 
+				MDRin <= 0; Read <= 0; MDRoutC <= 0; IRin <= 0;
+				Grb <= 1; RoutB <= 1; NEG <= 1; Zin <= 1; IncPC <= 1; MARin <= 1; PCin <= 1;
 			end
 			neg1: begin
-				Grb <= 0; Rout <= 0; Yin <= 0;
-				Grb <= 1; Rout <= 1; NEG <= 1; Zin <= 1;
-			end
-			neg2: begin
-				Grb <= 0; Rout <= 0; NEG <= 0; Zin <= 0;
-				Zlowout <= 1; Gra <= 1; Rin <= 1;
+				Grb <= 0; RoutB <= 0; NEG <= 0; Zin <= 0; IncPC <= 0; MARin <= 0; PCin <= 0;
+				ZlowoutA <= 1; Gra <= 1; Rin <= 1; RinSel <= 2'b00; Read <= 1;
 			end
 
 			not0: begin
-				MDRout <= 0; IRin <= 0; Read <= 0; MDRin <= 0;
-				Grb <= 1; Rout <= 1; Yin <= 1; 
+				MDRin <= 0; Read <= 0; MDRoutC <= 0; IRin <= 0;
+				Grb <= 1; RoutB <= 1; NOT <= 1; Zin <= 1; IncPC <= 1; MARin <= 1; PCin <= 1;
 			end
 			not1: begin
-				Grb <= 0; Rout <= 0; Yin <= 0;
-				Grb <= 1; Rout <= 1; NOT <= 1; Zin <= 1;
-			end
-			not2: begin
-				Grb <= 0; Rout <= 0; NOT <= 0; Zin <= 0;
-				Zlowout <= 1; Gra <= 1; Rin <= 1;
+				Grb <= 0; RoutB <= 0; NOT <= 0; Zin <= 0; IncPC <= 0; MARin <= 0; PCin <= 0;
+				ZlowoutA <= 1; Gra <= 1; Rin <= 1; RinSel <= 2'b00; Read <= 1;
 			end
 			
 			br0: begin
-				MDRout <= 0; IRin <= 0; Read <= 0; MDRin <= 0;
-				Gra <= 1; Rout <= 1; CONin <= 1;
+				MDRin <= 0; Read <= 0; MDRoutC <= 0; IRin <= 0;
+				Gra <= 1; RoutA <= 1; RinSel <= 2'b00; CONin <= 1;
 			end
 			br1: begin
-				Gra <= 0; Rout <= 0; CONin <= 0;
-				IncPC <= 1; PCin <= 1; Br <= 1;
-			end
-			br2: begin
-				IncPC <= 0; PCin <= 0; Br <= 0;
-				CON_RESET <= 1;
+				Gra <= 0; RoutA <= 0; CONin <= 0;
+				IncPC <= 1; PCin <= 1; Br <= 1; CON_RESET <= 1;
 			end
 			
 			jal0: begin
-				MDRout <= 0; IRin <= 0; Read <= 0; MDRin <= 0;
-				PCSave <= 1; PCout <= 1; Gra <= 1; Rin <= 1;
+				MDRin <= 0; Read <= 0; MDRoutC <= 0; IRin <= 0;
+				PCSave <= 1; PCoutA <= 1; RinSel <= 2'b00; Gra <= 1; Rin <= 1;
 			end
 			jal1: begin
-				PCSave <= 0; PCout <= 0; Gra <= 1; Rin <= 1;
-				Gra <= 1; Rout <= 1; PCin <= 1;
+				PCSave <= 0; PCoutA <= 0; Gra <= 1; Rin <= 1;
+				Gra <= 1; RoutA <= 1; RinSel <= 2'b00; PCin <= 1;
 			end
 
 			jr0: begin
-				MDRout <= 0; IRin <= 0; Read <= 0; MDRin <= 0;
-				Gra <= 1; Rout <= 1; PCin <= 1; 
+				MDRin <= 0; Read <= 0; MDRoutC <= 0; IRin <= 0;
+				Gra <= 1; RoutA <= 1; RinSel <= 2'b00; PCin <= 1;
 			end
 			
 			in0: begin
-				MDRout <= 0; IRin <= 0; Read <= 0; MDRin <= 0;
-				INout <= 1; Gra <= 1; Rin <= 1;
+				MDRin <= 0; Read <= 0; MDRoutC <= 0; IRin <= 0;
+				INoutA <= 1; Gra <= 1; RinSel <= 2'b00; Rin <= 1; IncPC <= 1; MARin <= 1; PCin <= 1;
 			end
 			
 			out0: begin
-				MDRout <= 0; IRin <= 0; Read <= 0; MDRin <= 0;
-				Gra <= 1; Rout <= 1; OUT_Portin <= 1; 
+				MDRin <= 0; Read <= 0; MDRoutC <= 0; IRin <= 0;
+				Gra <= 1; RoutA <= 1; RinSel <= 2'b00; OUT_Portin <= 1; IncPC <= 1; MARin <= 1; PCin <= 1;
 			end
 			
 			mflo0: begin
-				MDRout <= 0; IRin <= 0; Read <= 0; MDRin <= 0;
-				LOout <= 1; Gra <= 1; Rin <= 1;
+				MDRin <= 0; Read <= 0; MDRoutC <= 0; IRin <= 0;
+				LOoutA <= 1; Gra <= 1; RinSel <= 2'b00; Rin <= 1; IncPC <= 1; MARin <= 1; PCin <= 1;
 			end
 			
 			mfhi0: begin
-				MDRout <= 0; IRin <= 0; Read <= 0; MDRin <= 0;
-				HIout <= 1; Gra <= 1; Rin <= 1;
+				MDRin <= 0; Read <= 0; MDRoutC <= 0; IRin <= 0;
+				HIoutA <= 1; Gra <= 1; RinSel <= 2'b00; Rin <= 1; IncPC <= 1; MARin <= 1; PCin <= 1;
 			end
 			
 			nop0: begin
-				MDRout <= 0; IRin <= 0; Read <= 0; MDRin <= 0;
+				MDRin <= 0; Read <= 0; MDRoutC <= 0; IRin <= 0; IncPC <= 1; MARin <= 1; PCin <= 1;
 			end
 			
 			halt0: begin
-				MDRout <= 0; IRin <= 0; Read <= 0; MDRin <= 0;
+				MDRin <= 0; Read <= 0; MDRoutC <= 0; IRin <= 0;
 			end
 
 		endcase
@@ -559,14 +479,17 @@ module control_unit(
 	
 	assign IR_bus = PCSave ? 32'h04000000: IR;
 	
-	select_encode s_e(
-		.Gra(Gra), .Grb(Grb), .Grc(Grc), 
-		.Rin(Rin), .Rout(Rout), .BAout(BAout),
-		.data(IR_bus),
-		.regin(regin), 
-		.regout(regout), 
-		.C_sign_extended(CSIGN)
+	select_encode_ABC se(
+		Gra, Grb, Grc,
+		Rin,
+		RoutA, RoutB, RoutC,
+		BAout,
+		RinSel,
+		IR_bus,
+		regin, regout_A, regout_B, regout_C,
+		CSIGN
 	);
+
 
 
 endmodule
